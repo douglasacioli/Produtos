@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+**/*.user
+**/*.swp
+**/*.suo
+**/*.db
+*.mdf
+*.ldf
+*.log
+.git
+.gitignore
+Dockerfile
+docker-compose*.yml
+docker-compose.override.yml

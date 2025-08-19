@@ -11,7 +11,7 @@ export default function App() {
   async function fetchProdutos() {
     setLoading(true); setError('')
     try {
-      const res = await fetch(`${API_URL}/Produto`)
+      const res = await fetch(`${API_URL}/produto`)
       if (!res.ok) throw new Error('Falha ao carregar produtos')
       setProdutos(await res.json())
     } catch (e) { setError(e.message) } finally { setLoading(false) }
@@ -21,7 +21,7 @@ export default function App() {
   async function handleSubmit(e) {
     e.preventDefault(); setError(''); setSuccess('')
     try {
-      const res = await fetch(`${API_URL}/Produto`, {
+      const res = await fetch(`${API_URL}/produto`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nome: form.nome, valor: Number(form.valor), categoria: form.categoria })
