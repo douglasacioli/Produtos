@@ -1,0 +1,60 @@
+trigger:
+- main
+
+resources:
+- repo: self
+
+variables:
+  vmImageName: 'ubuntu-latest'
+
+  # conexão de serviço para o ACR (você já tem)
+  dockerRegistryServiceConnection: '36a8a371-f371-4897-bbf2-799a200c1621'
+  containerRegistry: 'produto.azurecr.io'
+
+  # repositórios de imagem no seu ACR (nomes exemplos)
+  apiImageRepository: 'produtos-api'
+  webImageRepository: 'produtos-web'
+
+  # tags publicadas (BuildId e latest; sem “v5”)
+  buildTag: '$(Build.BuildId)'
+  latestTag: 'latest'
+
+stages:
+- stage: BuildAndPush
+  displayName: Build & Push API + WEB
+  jobs:
+
+  - job: API
+    displayName: Build & Push API
+    pool: { vmImage: $(vmImageName) }
+    steps:
+    - task: Docker@2
+      displayName: Build & Push API image
+      inputs:
+        command: buildAndPush
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(apiImageRepository)
+        dockerfile: 'produtos.api/Dockerfile'     # << confirme o caminho/case
+        buildContext: 'produtos.api'              # << confirme o caminho/case
+        tags: |
+          $(buildTag)
+          $(latestTag)
+
+  - job: WEB
+    displayName: Build & Push WEB
+    pool: { vmImage: $(vmImageName) }
+    steps:
+    - task: Docker@2
+      displayName: Build & Push WEB image
+      inputs:
+        command: buildAndPush
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(webImageRepository)
+        dockerfile: 'web/Dockerfile'              # << confirme o caminho
+        buildContext: 'web'
+        # Se o front (Vite) precisar da URL da API em build-time, adicione:
+        # arguments: |
+        #   --build-arg VITE_API_URL=https://sua-api.azurewebsites.net
+        tags: |
+          $(buildTag)
+          $(latestTag)
