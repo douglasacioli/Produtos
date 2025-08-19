@@ -64,6 +64,7 @@ using (var scope = app.Services.CreateScope())
     {
         ctx.Produtos.AddRange(
             new Produtos.Api.Domain.Entities.Produto { Nome = "Teclado Mecânico", Valor = 299.90m, Categoria = "Periféricos" },
+            new Produtos.Api.Domain.Entities.Produto { Nome = "Microondas", Valor = 299.90m, Categoria = "Eletrodomésticos" },
             new Produtos.Api.Domain.Entities.Produto { Nome = "Mouse Gamer", Valor = 159.00m, Categoria = "Periféricos" }
         );
         ctx.SaveChanges();
