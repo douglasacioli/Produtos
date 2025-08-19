@@ -1,21 +1,20 @@
 trigger:
 - main
 
+# (opcional) pode remover toda a seção resources; se quiser manter, corrija o typo:
 resources:
 - repo: self
 
 variables:
+  # vmImage não será usado com self-hosted, pode até remover
   vmImageName: 'ubuntu-latest'
 
-  # conexão de serviço para o ACR (você já tem)
   dockerRegistryServiceConnection: '36a8a371-f371-4897-bbf2-799a200c1621'
   containerRegistry: 'produto.azurecr.io'
 
-  # repositórios de imagem no seu ACR (nomes exemplos)
   apiImageRepository: 'produtos-api'
   webImageRepository: 'produtos-web'
 
-  # tags publicadas (BuildId e latest; sem “v5”)
   buildTag: '$(Build.BuildId)'
   latestTag: 'latest'
 
@@ -26,7 +25,8 @@ stages:
 
   - job: API
     displayName: Build & Push API
-    pool: { vmImage: $(vmImageName) }
+    pool: 
+      name: Default           # << usa seu pool self-hosted (agente online)
     steps:
     - task: Docker@2
       displayName: Build & Push API image
@@ -34,15 +34,16 @@ stages:
         command: buildAndPush
         containerRegistry: $(dockerRegistryServiceConnection)
         repository: $(apiImageRepository)
-        dockerfile: 'produtos.api/Dockerfile'     # << confirme o caminho/case
-        buildContext: 'produtos.api'              # << confirme o caminho/case
+        dockerfile: 'produtos.api/Dockerfile'   # confira o Case/caminho
+        buildContext: 'produtos.api'            # confira o Case/caminho
         tags: |
           $(buildTag)
           $(latestTag)
 
   - job: WEB
     displayName: Build & Push WEB
-    pool: { vmImage: $(vmImageName) }
+    pool: 
+      name: Default           # << mesmo pool
     steps:
     - task: Docker@2
       displayName: Build & Push WEB image
@@ -50,11 +51,9 @@ stages:
         command: buildAndPush
         containerRegistry: $(dockerRegistryServiceConnection)
         repository: $(webImageRepository)
-        dockerfile: 'web/Dockerfile'              # << confirme o caminho
+        dockerfile: 'web/Dockerfile'
         buildContext: 'web'
-        # Se o front (Vite) precisar da URL da API em build-time, adicione:
-        # arguments: |
-        #   --build-arg VITE_API_URL=https://sua-api.azurewebsites.net
+        # Se precisar passar --build-arg (Vite), separe em build + push (ver nota abaixo)
         tags: |
           $(buildTag)
           $(latestTag)
