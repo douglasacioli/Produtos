@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react'
-const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7006'
+//const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7006'
+
+const API_URL = import.meta.env.VITE_API_URL
+if (!API_URL) {
+  throw new Error('VITE_API_URL não definida. Configure .env.production antes do build.')
+}
 
 export default function App() {
   const [produtos, setProdutos] = useState([])

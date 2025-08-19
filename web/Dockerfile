@@ -1,16 +1,16 @@
-# Etapa 1: build (Node)
+# ===== Build (Vite) =====
 FROM node:18 AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci || npm i
 COPY . .
+# usa .env.production automaticamente
 RUN npm run build
 
-# Etapa 2: servir arquivos estáticos (Nginx)
+# ===== Runtime (Nginx) =====
 FROM nginx:alpine
-# Limpa o conteúdo padrão do nginx
-RUN rm -rf /usr/share/nginx/html/*
-# Copia a saída do Vite
+# copia o build para a raiz do Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
+# (opcional) healthcheck simples
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
